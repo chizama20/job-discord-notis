@@ -1,0 +1,22 @@
+[
+  { "name": "Waymo",          "type": "greenhouse", "slug": "waymo",            "priority": true  },
+  { "name": "Anduril",        "type": "greenhouse", "slug": "andurilindustries", "priority": true  },
+  { "name": "SpaceX",         "type": "greenhouse", "slug": "spacex",            "priority": true  },
+  { "name": "Anthropic",      "type": "greenhouse", "slug": "anthropic",         "priority": true  },
+  { "name": "Motional",       "type": "greenhouse", "slug": "motional",          "priority": true  },
+  { "name": "Archer Aviation","type": "greenhouse", "slug": "archer",            "priority": true  },
+  { "name": "Nuro",           "type": "greenhouse", "slug": "nuro",              "priority": true  },
+  { "name": "Ghost Autonomy", "type": "greenhouse", "slug": "ghost",             "priority": true  },
+  { "name": "Kodiak Robotics","type": "greenhouse", "slug": "kodiak",            "priority": false },
+  { "name": "May Mobility",   "type": "greenhouse", "slug": "maymobility",       "priority": false },
+  { "name": "Scale AI",       "type": "greenhouse", "slug": "scaleai",           "priority": true  },
+  { "name": "Optiver",        "type": "greenhouse", "slug": "optiver",           "priority": true  },
+  { "name": "Stripe",         "type": "greenhouse", "slug": "stripe",            "priority": true  },
+  { "name": "Airbnb",         "type": "greenhouse", "slug": "airbnb",            "priority": true  },
+  { "name": "Lyft",           "type": "greenhouse", "slug": "lyft",              "priority": false },
+  { "name": "Coinbase",       "type": "greenhouse", "slug": "coinbase",          "priority": false },
+  { "name": "Figma",          "type": "greenhouse", "slug": "figma",             "priority": false },
+  { "name": "Robinhood",      "type": "greenhouse", "slug": "robinhood",         "priority": false },
+  { "name": "Shield AI",      "type": "lever",      "slug": "shieldai",          "priority": true  },
+  { "name": "Palantir",       "type": "lever",      "slug": "palantir",          "priority": true  }
+]
