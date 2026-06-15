@@ -6,6 +6,11 @@ load_dotenv()
 
 BROAD_WEBHOOK_URL = os.getenv("BROAD_WEBHOOK_URL", "")
 PRIORITY_WEBHOOK_URL = os.getenv("PRIORITY_WEBHOOK_URL", "")
+
+# Optional: post into specific existing Discord threads instead of creating new ones per run
+# Right-click a thread in Discord → Copy Link → the last number in the URL is the ID
+BROAD_THREAD_ID = os.getenv("BROAD_THREAD_ID", "")
+PRIORITY_THREAD_ID = os.getenv("PRIORITY_THREAD_ID", "")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
 
 SLACK_USER_TOKEN = os.getenv("SLACK_USER_TOKEN", "")

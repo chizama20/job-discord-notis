@@ -4,21 +4,31 @@ from datetime import datetime
 import requests
 
 SOURCE_COLORS = {
-    "github":        0x57F287,
-    "greenhouse":    0x5865F2,
-    "lever":         0x5865F2,
-    "remoteok":      0xFFA500,
-    "colorstack":    0x9B59B6,
-    "colorstack_ft": 0xE91E8C,
+    "github":            0x57F287,
+    "github_internships": 0x2ECC71,
+    "greenhouse":        0x5865F2,
+    "lever":             0x5865F2,
+    "remoteok":          0xFFA500,
+    "colorstack":        0x9B59B6,
+    "colorstack_ft":     0xE91E8C,
+    "indeed":            0x003A9B,
+    "zip_recruiter":     0x00B140,
+    "linkedin":          0x0A66C2,
+    "google":            0xEA4335,
 }
 
 SOURCE_LABELS = {
-    "github":        "SimplifyJobs GitHub",
-    "greenhouse":    "Greenhouse",
-    "lever":         "Lever",
-    "remoteok":      "RemoteOK",
-    "colorstack":    "ColorStack",
-    "colorstack_ft": "ColorStack (FT)",
+    "github":            "SimplifyJobs New Grad",
+    "github_internships": "SimplifyJobs Internships",
+    "greenhouse":        "Greenhouse",
+    "lever":             "Lever",
+    "remoteok":          "RemoteOK",
+    "colorstack":        "ColorStack",
+    "colorstack_ft":     "ColorStack (FT)",
+    "indeed":            "Indeed",
+    "zip_recruiter":     "ZipRecruiter",
+    "linkedin":          "LinkedIn",
+    "google":            "Google Jobs",
 }
 
 BATCH_SIZE = 5
@@ -75,12 +85,24 @@ def _send_batched(webhook_url: str, jobs: list[dict], label: str):
         _request(webhook_url, {"embeds": [_build_embed(j) for j in batch]})
 
 
-def send_thread(webhook_url: str, jobs: list[dict], label: str):
+def send_thread(webhook_url: str, jobs: list[dict], label: str, thread_id: str = ""):
     """
-    Tries to post jobs as a Discord thread (requires Forum channel).
-    Falls back to batched embeds in a regular text channel on 400.
+    Posts jobs to Discord.
+    - If thread_id is set: posts embeds directly into that existing thread.
+    - Otherwise: tries to create a new thread (requires Forum channel), falls back
+      to batched embeds in a regular text channel on 400.
     """
     if not webhook_url or not jobs:
+        return
+
+    if thread_id:
+        thread_url = webhook_url + f"?thread_id={thread_id}"
+        now = datetime.now().strftime("%b %d, %I:%M %p")
+        summary = f"**{label} — {now} ({len(jobs)} new)**\n{_source_breakdown(jobs)}"
+        _request(thread_url, {"content": summary})
+        for i in range(0, len(jobs), BATCH_SIZE):
+            batch = jobs[i : i + BATCH_SIZE]
+            _request(thread_url, {"embeds": [_build_embed(j) for j in batch]})
         return
 
     now = datetime.now().strftime("%b %d, %I:%M %p")
@@ -105,7 +127,10 @@ def send_thread(webhook_url: str, jobs: list[dict], label: str):
         _send_batched(webhook_url, jobs, label)
         return
 
-    thread_id = resp.json().get("channel_id")
+    try:
+        thread_id = resp.json().get("channel_id")
+    except Exception:
+        thread_id = None
     if not thread_id:
         print(f"[notifier] '{label}': no thread_id returned, using batched mode")
         _send_batched(webhook_url, jobs, label)

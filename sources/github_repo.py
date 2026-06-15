@@ -1,10 +1,17 @@
 import re
 import requests
 
-README_URL = (
-    "https://api.github.com/repos/SimplifyJobs/New-Grad-Positions"
-    "/contents/README.md?ref=dev"
-)
+_BASE = "https://api.github.com/repos/SimplifyJobs/{repo}/contents/README.md?ref=dev"
+
+REPO_URLS = {
+    "new_grad":    _BASE.format(repo="New-Grad-Positions"),
+    "internships": _BASE.format(repo="Summer2026-Internships"),
+}
+
+REPO_SOURCE = {
+    "new_grad":    "github",
+    "internships": "github_internships",
+}
 
 HEADERS = {
     "User-Agent": "job-alert-bot/1.0",
@@ -38,7 +45,7 @@ def _apply_url(cell_html: str) -> str:
     return hrefs[0] if hrefs else ""
 
 
-def _parse(readme: str) -> list[dict]:
+def _parse(readme: str, source: str) -> list[dict]:
     jobs = []
     last_company = ""
 
@@ -71,22 +78,25 @@ def _parse(readme: str) -> list[dict]:
             "company": company,
             "location": location,
             "url": url,
-            "source": "github",
+            "source": source,
         })
 
     return jobs
 
 
-def fetch(github_token: str = "") -> list[dict]:
+def fetch(github_token: str = "", repo: str = "new_grad") -> list[dict]:
+    url = REPO_URLS.get(repo, REPO_URLS["new_grad"])
+    source = REPO_SOURCE.get(repo, "github")
+
     headers = dict(HEADERS)
     if github_token:
         headers["Authorization"] = f"token {github_token}"
 
     try:
-        resp = requests.get(README_URL, headers=headers, timeout=30)
+        resp = requests.get(url, headers=headers, timeout=30)
         resp.raise_for_status()
-        jobs = _parse(resp.text)
+        jobs = _parse(resp.text, source)
         return jobs
     except Exception as exc:
-        print(f"[github] fetch failed: {exc}")
+        print(f"[github:{repo}] fetch failed: {exc}")
         return []

@@ -2,6 +2,8 @@ import logging
 from config import (
     BROAD_WEBHOOK_URL,
     PRIORITY_WEBHOOK_URL,
+    BROAD_THREAD_ID,
+    PRIORITY_THREAD_ID,
     SWE_ADJACENT_KEYWORDS,
     SENIOR_EXCLUDE_KEYWORDS,
     INTERNSHIP_KEYWORDS,
@@ -21,7 +23,7 @@ from db.database import (
 )
 from filters import is_swe_adjacent, is_too_senior, is_us_location, should_send_priority
 from notifier import send_thread
-from sources import remoteok, greenhouse_lever, github_repo, colorstack_slack
+from sources import remoteok, greenhouse_lever, github_repo, colorstack_slack, jobspy_source
 
 logging.basicConfig(
     level=logging.INFO,
@@ -59,10 +61,24 @@ def _fetch_all() -> list[dict]:
 
     try:
         jobs = github_repo.fetch(github_token=GITHUB_TOKEN)
-        log.info(f"github: {len(jobs)} fetched")
+        log.info(f"github new-grad: {len(jobs)} fetched")
         all_jobs.extend(jobs)
     except Exception as exc:
-        log.error(f"github crashed: {exc}")
+        log.error(f"github new-grad crashed: {exc}")
+
+    try:
+        jobs = github_repo.fetch(github_token=GITHUB_TOKEN, repo="internships")
+        log.info(f"github internships: {len(jobs)} fetched")
+        all_jobs.extend(jobs)
+    except Exception as exc:
+        log.error(f"github internships crashed: {exc}")
+
+    try:
+        jobs = jobspy_source.fetch()
+        log.info(f"indeed rss: {len(jobs)} fetched")
+        all_jobs.extend(jobs)
+    except Exception as exc:
+        log.error(f"jobspy crashed: {exc}")
 
     return all_jobs
 
@@ -106,11 +122,11 @@ def run():
     priority_batch = get_queue_batch("priority", PRIORITY_BATCH_SIZE)
 
     if broad_batch:
-        send_thread(BROAD_WEBHOOK_URL, broad_batch, "New Jobs")
+        send_thread(BROAD_WEBHOOK_URL, broad_batch, "New Jobs", thread_id=BROAD_THREAD_ID)
         mark_queue_sent([j["url"] for j in broad_batch], "broad")
 
     if priority_batch:
-        send_thread(PRIORITY_WEBHOOK_URL, priority_batch, "Priority Picks")
+        send_thread(PRIORITY_WEBHOOK_URL, priority_batch, "Priority Picks", thread_id=PRIORITY_THREAD_ID)
         mark_queue_sent([j["url"] for j in priority_batch], "priority")
 
     remaining = get_queue_depth()
