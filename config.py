@@ -35,14 +35,18 @@ SWE_ADJACENT_KEYWORDS = [
 # Title prefixes/words that mark a role as too senior — excluded from all channels
 SENIOR_EXCLUDE_KEYWORDS = [
     "senior", "sr.", "sr ",
-    "staff engineer", "staff software",
+    "staff",                                               # Staff Engineer, Staff Data Scientist (L6+)
     "principal",
     "director",
-    "vice president", " vp ",
+    "vice president", "vp ",                              # "VP " at start + " vp " mid-title
     "manager",
     "head of",
     "chief",
     "distinguished",
+    "tech lead", "team lead",                             # Lead roles (avoid plain "lead" → blocks leadership programs)
+    "lead engineer", "lead developer", "lead software", "lead data", "lead ml",
+    "architect",                                          # Solutions/Enterprise/Software Architect
+    "experienced",                                        # "Experienced SWE" = mid-level+
 ]
 
 # Keywords that mark a posting as an internship/co-op (excludes from priority)
